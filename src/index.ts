@@ -7,10 +7,13 @@ import { fetchNewsletters } from "./mail";
 
 async function main(): Promise<void> {
   const config = loadConfig();
-  const { discordWebhookUrl, maxPostsPerCheck, sites, gmail } = config;
+  const { maxPostsPerCheck, sites, gmail } = config;
+
+  // 環境変数を優先、なければconfig.jsonから取得
+  const discordWebhookUrl = process.env.DISCORD_WEBHOOK_URL || config.discordWebhookUrl;
 
   if (!discordWebhookUrl) {
-    console.error("[bot] Webhook URL が未設定です。先に npm run setup を実行してください。");
+    console.error("[bot] DISCORD_WEBHOOK_URL が設定されていません。");
     process.exit(1);
   }
 
