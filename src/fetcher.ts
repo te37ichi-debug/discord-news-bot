@@ -45,6 +45,9 @@ async function getCategoryName(
   }
   try {
     const res = await axios.get(`${apiBase}/categories/${categoryId}`, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+      },
       timeout: 10000,
     });
     const name: string = res.data.name;
@@ -77,6 +80,10 @@ export async function fetchNewArticles(
           order: "desc",
           _fields: "id,title,link,date,categories,_links",
           _embed: true,
+        },
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+          "Accept": "application/json",
         },
         timeout: 15000,
       });
