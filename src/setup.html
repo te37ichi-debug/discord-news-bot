@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discord News Bot - 設定</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #1a1a2e; color: #e0e0e0; min-height: 100vh;
+  }
+  .container { max-width: 800px; margin: 0 auto; padding: 24px 16px; }
+  h1 { text-align: center; margin-bottom: 8px; color: #fff; font-size: 1.6rem; }
+  .subtitle { text-align: center; color: #888; margin-bottom: 32px; font-size: 0.9rem; }
+
+  /* タブ */
+  .tabs { display: flex; gap: 4px; margin-bottom: 24px; flex-wrap: wrap; }
+  .tab {
+    padding: 10px 20px; border: none; background: #16213e; color: #aaa;
+    border-radius: 8px 8px 0 0; cursor: pointer; font-size: 0.95rem; transition: all .2s;
+  }
+  .tab:hover { background: #1a2744; color: #ddd; }
+  .tab.active { background: #0f3460; color: #fff; font-weight: 600; }
+
+  /* パネル */
+  .panel { display: none; background: #16213e; border-radius: 0 12px 12px 12px; padding: 24px; }
+  .panel.active { display: block; }
+
+  /* フォーム要素 */
+  label { display: block; font-size: 0.85rem; color: #aaa; margin-bottom: 4px; margin-top: 16px; }
+  label:first-child { margin-top: 0; }
+  input[type="text"], input[type="number"], input[type="url"], input[type="password"] {
+    width: 100%; padding: 10px 12px; background: #1a1a2e; border: 1px solid #333;
+    border-radius: 6px; color: #fff; font-size: 0.95rem; outline: none; transition: border .2s;
+  }
+  input:focus { border-color: #e94560; }
+  input[type="color"] {
+    width: 48px; height: 36px; border: 1px solid #333; border-radius: 6px;
+    background: none; cursor: pointer; padding: 2px;
+  }
+  .row { display: flex; gap: 12px; align-items: flex-end; }
+  .row > * { flex: 1; }
+  .row .small { flex: 0 0 80px; }
+
+  /* サイトカード */
+  .site-card {
+    background: #1a1a2e; border-radius: 8px; padding: 16px; margin-bottom: 12px;
+    border-left: 4px solid #808080; position: relative; transition: opacity .2s;
+  }
+  .site-card.disabled { opacity: 0.5; }
+  .site-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .site-card-title { font-weight: 600; font-size: 1.05rem; }
+  .site-card-actions { display: flex; gap: 6px; }
+  .site-card-url { font-size: 0.85rem; color: #888; }
+
+  /* ボタン */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer;
+    font-size: 0.9rem; transition: all .2s;
+  }
+  .btn-primary { background: #e94560; color: #fff; }
+  .btn-primary:hover { background: #c73e54; }
+  .btn-success { background: #2ecc71; color: #fff; }
+  .btn-success:hover { background: #27ae60; }
+  .btn-ghost { background: transparent; color: #aaa; border: 1px solid #444; }
+  .btn-ghost:hover { background: #1a2744; color: #ddd; }
+  .btn-danger { background: transparent; color: #e94560; border: 1px solid #e94560; }
+  .btn-danger:hover { background: #e94560; color: #fff; }
+  .btn-sm { padding: 5px 10px; font-size: 0.8rem; }
+
+  /* トグル */
+  .toggle { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
+  .toggle-switch {
+    width: 44px; height: 24px; background: #444; border-radius: 12px;
+    position: relative; cursor: pointer; transition: background .2s;
+  }
+  .toggle-switch.on { background: #2ecc71; }
+  .toggle-switch::after {
+    content: ''; position: absolute; width: 20px; height: 20px; background: #fff;
+    border-radius: 50%; top: 2px; left: 2px; transition: left .2s;
+  }
+  .toggle-switch.on::after { left: 22px; }
+  .toggle-label { font-size: 0.9rem; }
+
+  /* モーダル */
+  .modal-bg {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    z-index: 100; justify-content: center; align-items: center;
+  }
+  .modal-bg.show { display: flex; }
+  .modal {
+    background: #16213e; border-radius: 12px; padding: 24px; width: 90%; max-width: 520px;
+    max-height: 90vh; overflow-y: auto;
+  }
+  .modal h2 { margin-bottom: 16px; font-size: 1.2rem; }
+  .modal-footer { margin-top: 20px; display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* トースト */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; background: #2ecc71; color: #fff;
+    padding: 12px 24px; border-radius: 8px; font-size: 0.95rem;
+    transform: translateY(80px); opacity: 0; transition: all .3s; z-index: 200;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.error { background: #e94560; }
+
+  .section-desc { color: #888; font-size: 0.85rem; margin-bottom: 16px; line-height: 1.5; }
+  .empty-msg { color: #666; text-align: center; padding: 32px 0; font-size: 0.95rem; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Discord News Bot</h1>
+  <p class="subtitle">設定管理</p>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="discord">Discord</button>
+    <button class="tab" data-tab="sites">WordPress サイト</button>
+    <button class="tab" data-tab="mail">IMAP メルマガ</button>
+    <button class="tab" data-tab="gmail">Gmail API</button>
+    <button class="tab" data-tab="general">全般</button>
+  </div>
+
+  <!-- Discord -->
+  <div id="tab-discord" class="panel active">
+    <p class="section-desc">Discordサーバーの「ウェブフック」から取得したURLを入力してください。</p>
+    <label>Webhook URL</label>
+    <input type="url" id="webhookUrl" placeholder="https://discord.com/api/webhooks/...">
+  </div>
+
+  <!-- WordPress -->
+  <div id="tab-sites" class="panel">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <p class="section-desc" style="margin:0;">記事を取得する WordPress サイトを管理します。</p>
+      <button class="btn btn-primary btn-sm" onclick="openAddSite()">+ サイト追加</button>
+    </div>
+    <div id="siteList"></div>
+  </div>
+
+  <!-- IMAP メルマガ -->
+  <div id="tab-mail" class="panel">
+    <p class="section-desc">IMAP経由でGmailからメルマガを取得します。Googleアカウントのアプリパスワードが必要です。</p>
+
+    <div class="toggle">
+      <div id="mailToggle" class="toggle-switch" onclick="toggleMail()"></div>
+      <span class="toggle-label" id="mailStatus">無効</span>
+    </div>
+
+    <div id="mailFields">
+      <label>Gmailアドレス</label>
+      <input type="text" id="mailUser" placeholder="example@gmail.com">
+      <label>アプリパスワード</label>
+      <input type="password" id="mailAppPassword" placeholder="xxxx xxxx xxxx xxxx">
+      <label>取得対象の差出人アドレス（From）（空欄で全て）</label>
+      <input type="text" id="mailFrom" placeholder="newsletter@example.com">
+      <label>メルマガ送信先 Webhook URL（空欄でメインと同じ）</label>
+      <input type="url" id="mailWebhookUrl" placeholder="https://discord.com/api/webhooks/...">
+    </div>
+  </div>
+
+  <!-- Gmail -->
+  <div id="tab-gmail" class="panel">
+    <p class="section-desc">Gmailのメルマガを取得してDiscordに投稿します。Google Cloud ConsoleでOAuth認証情報を取得してください。</p>
+
+    <div class="toggle">
+      <div id="gmailToggle" class="toggle-switch" onclick="toggleGmail()"></div>
+      <span class="toggle-label" id="gmailStatus">無効</span>
+    </div>
+
+    <div id="gmailFields">
+      <label>Client ID</label>
+      <input type="text" id="gmailClientId" placeholder="xxxxxxxx.apps.googleusercontent.com">
+      <label>Client Secret</label>
+      <input type="password" id="gmailClientSecret" placeholder="GOCSPX-xxxxxxxx">
+      <label>Refresh Token</label>
+      <input type="password" id="gmailRefreshToken" placeholder="1//xxxxxxxx">
+      <label>対象ラベル名</label>
+      <input type="text" id="gmailLabel" placeholder="メルマガ">
+    </div>
+  </div>
+
+  <!-- 全般 -->
+  <div id="tab-general" class="panel">
+    <p class="section-desc">チェック頻度と1回あたりの最大取得件数を設定します。</p>
+    <div class="row">
+      <div>
+        <label>チェック間隔（分）</label>
+        <input type="number" id="interval" min="1" max="1440">
+      </div>
+      <div>
+        <label>最大取得件数（件/ソース）</label>
+        <input type="number" id="maxPosts" min="1" max="50">
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:24px; display:flex; justify-content:flex-end;">
+    <button class="btn btn-success" onclick="saveAll()">設定を保存</button>
+  </div>
+</div>
+
+<!-- サイト追加/編集モーダル -->
+<div class="modal-bg" id="siteModal">
+  <div class="modal">
+    <h2 id="siteModalTitle">サイトを追加</h2>
+    <input type="hidden" id="editIndex" value="-1">
+    <label>サイト名</label>
+    <input type="text" id="modalName" placeholder="例: My Blog">
+    <label>サイトURL</label>
+    <input type="url" id="modalUrl" placeholder="https://example.com/">
+    <label>WP REST API ベースURL（空欄で自動生成）</label>
+    <input type="url" id="modalApi" placeholder="https://example.com/wp-json/wp/v2">
+    <div class="row" style="margin-top:16px;">
+      <div>
+        <label>Embed 色</label>
+        <input type="text" id="modalColorText" placeholder="#1DA1F2" style="width:120px;">
+      </div>
+      <div class="small">
+        <label>&nbsp;</label>
+        <input type="color" id="modalColorPicker" value="#808080">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveSite()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let config = null;
+
+// ─── 初期化 ───
+
+async function init() {
+  const res = await fetch('/api/config');
+  config = await res.json();
+  render();
+}
+
+function render() {
+  document.getElementById('webhookUrl').value = config.discordWebhookUrl || '';
+  document.getElementById('interval').value = config.checkIntervalMinutes;
+  document.getElementById('maxPosts').value = config.maxPostsPerCheck;
+
+  // IMAP メルマガ
+  if (!config.mail) config.mail = { enabled: false, user: '', appPassword: '', from: '' };
+  const m = config.mail;
+  const mailToggle = document.getElementById('mailToggle');
+  const mailStatus = document.getElementById('mailStatus');
+  mailToggle.classList.toggle('on', m.enabled);
+  mailStatus.textContent = m.enabled ? '有効' : '無効';
+  document.getElementById('mailUser').value = m.user || '';
+  document.getElementById('mailAppPassword').value = m.appPassword || '';
+  document.getElementById('mailFrom').value = m.from || '';
+  document.getElementById('mailWebhookUrl').value = m.webhookUrl || '';
+
+  // Gmail API
+  const g = config.gmail;
+  const toggle = document.getElementById('gmailToggle');
+  const status = document.getElementById('gmailStatus');
+  toggle.classList.toggle('on', g.enabled);
+  status.textContent = g.enabled ? '有効' : '無効';
+  document.getElementById('gmailClientId').value = g.clientId || '';
+  document.getElementById('gmailClientSecret').value = g.clientSecret || '';
+  document.getElementById('gmailRefreshToken').value = g.refreshToken || '';
+  document.getElementById('gmailLabel').value = g.labelName || 'メルマガ';
+
+  renderSites();
+}
+
+// ─── タブ ───
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// ─── サイト一覧 ───
+
+function renderSites() {
+  const list = document.getElementById('siteList');
+  if (config.sites.length === 0) {
+    list.innerHTML = '<div class="empty-msg">サイトが登録されていません。「+ サイト追加」から追加してください。</div>';
+    return;
+  }
+  list.innerHTML = config.sites.map((s, i) => {
+    const cls = s.enabled ? '' : ' disabled';
+    const statusText = s.enabled ? 'ON' : 'OFF';
+    const statusColor = s.enabled ? '#2ecc71' : '#888';
+    return `
+      <div class="site-card${cls}" style="border-left-color:${s.color}">
+        <div class="site-card-header">
+          <div>
+            <span class="site-card-title">${esc(s.name)}</span>
+            <span style="color:${statusColor}; font-size:0.8rem; margin-left:8px;">${statusText}</span>
+          </div>
+          <div class="site-card-actions">
+            <button class="btn btn-ghost btn-sm" onclick="toggleSite(${i})">${s.enabled ? '無効にする' : '有効にする'}</button>
+            <button class="btn btn-ghost btn-sm" onclick="openEditSite(${i})">編集</button>
+            <button class="btn btn-danger btn-sm" onclick="removeSite(${i})">削除</button>
+          </div>
+        </div>
+        <div class="site-card-url">${esc(s.url)}</div>
+      </div>`;
+  }).join('');
+}
+
+function toggleSite(i) {
+  config.sites[i].enabled = !config.sites[i].enabled;
+  renderSites();
+}
+
+function removeSite(i) {
+  if (!confirm(`「${config.sites[i].name}」を削除しますか？`)) return;
+  config.sites.splice(i, 1);
+  renderSites();
+}
+
+// ─── サイト モーダル ───
+
+function openAddSite() {
+  document.getElementById('siteModalTitle').textContent = 'サイトを追加';
+  document.getElementById('editIndex').value = '-1';
+  document.getElementById('modalName').value = '';
+  document.getElementById('modalUrl').value = '';
+  document.getElementById('modalApi').value = '';
+  document.getElementById('modalColorText').value = '#808080';
+  document.getElementById('modalColorPicker').value = '#808080';
+  document.getElementById('siteModal').classList.add('show');
+}
+
+function openEditSite(i) {
+  const s = config.sites[i];
+  document.getElementById('siteModalTitle').textContent = 'サイトを編集';
+  document.getElementById('editIndex').value = i;
+  document.getElementById('modalName').value = s.name;
+  document.getElementById('modalUrl').value = s.url;
+  document.getElementById('modalApi').value = s.apiBase;
+  document.getElementById('modalColorText').value = s.color;
+  document.getElementById('modalColorPicker').value = s.color;
+  document.getElementById('siteModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('siteModal').classList.remove('show');
+}
+
+// カラーピッカー同期
+document.getElementById('modalColorPicker').addEventListener('input', (e) => {
+  document.getElementById('modalColorText').value = e.target.value;
+});
+document.getElementById('modalColorText').addEventListener('input', (e) => {
+  const v = e.target.value;
+  if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+    document.getElementById('modalColorPicker').value = v;
+  }
+});
+
+function saveSite() {
+  const name = document.getElementById('modalName').value.trim();
+  let url = document.getElementById('modalUrl').value.trim();
+  let apiBase = document.getElementById('modalApi').value.trim();
+  const color = document.getElementById('modalColorText').value.trim() || '#808080';
+  const idx = parseInt(document.getElementById('editIndex').value);
+
+  if (!name || !url) { toast('サイト名とURLを入力してください', true); return; }
+  if (!url.endsWith('/')) url += '/';
+  if (!apiBase) apiBase = url + 'wp-json/wp/v2';
+
+  const entry = { name, url, apiBase, color, enabled: true };
+
+  if (idx >= 0) {
+    entry.enabled = config.sites[idx].enabled;
+    config.sites[idx] = entry;
+  } else {
+    config.sites.push(entry);
+  }
+
+  closeModal();
+  renderSites();
+  toast(idx >= 0 ? '更新しました' : '追加しました');
+}
+
+// ─── IMAP メルマガ ───
+
+function toggleMail() {
+  config.mail.enabled = !config.mail.enabled;
+  render();
+}
+
+// ─── Gmail API ───
+
+function toggleGmail() {
+  config.gmail.enabled = !config.gmail.enabled;
+  render();
+}
+
+// ─── 保存 ───
+
+function collectForm() {
+  config.discordWebhookUrl = document.getElementById('webhookUrl').value.trim();
+  config.checkIntervalMinutes = parseInt(document.getElementById('interval').value) || 30;
+  config.maxPostsPerCheck = parseInt(document.getElementById('maxPosts').value) || 5;
+  config.gmail.clientId = document.getElementById('gmailClientId').value.trim();
+  config.gmail.clientSecret = document.getElementById('gmailClientSecret').value.trim();
+  config.gmail.refreshToken = document.getElementById('gmailRefreshToken').value.trim();
+  config.gmail.labelName = document.getElementById('gmailLabel').value.trim() || 'メルマガ';
+  config.mail.user = document.getElementById('mailUser').value.trim();
+  config.mail.appPassword = document.getElementById('mailAppPassword').value.trim();
+  config.mail.from = document.getElementById('mailFrom').value.trim();
+  config.mail.webhookUrl = document.getElementById('mailWebhookUrl').value.trim();
+}
+
+async function saveAll() {
+  collectForm();
+  const res = await fetch('/api/config', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(config),
+  });
+  if (res.ok) {
+    toast('設定を保存しました');
+  } else {
+    toast('保存に失敗しました', true);
+  }
+}
+
+// ─── ユーティリティ ───
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function toast(msg, isError) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.toggle('error', !!isError);
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ESCでモーダル閉じる
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+});
+document.getElementById('siteModal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+init();
+</script>
+</body>
+</html>

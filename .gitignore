@@ -1,0 +1,5 @@
+node_modules/
+dist/
+data/seen.json
+data/config.json
+.env

@@ -1,0 +1,35 @@
+name: Discord News Bot
+
+on:
+  schedule:
+    - cron: '0 * * * *' # 60分ごとに実行
+  workflow_dispatch:          # 手動実行ボタンも追加
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run bot
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_LABEL: ${{ secrets.GMAIL_LABEL }}
+          MAX_POSTS_PER_CHECK: '5'
+        run: npm start
+
+      - name: Save seen.json
+        uses: actions/cache@v4
+        with:
+          path: data/seen.json
+          key: seen-json-${{ github.run_id }}
+          restore-keys: seen-json-
