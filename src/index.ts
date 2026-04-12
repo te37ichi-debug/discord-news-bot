@@ -34,7 +34,7 @@ async function main(): Promise<void> {
     console.log(`[bot] 新着記事 ${articles.length}件を送信中...`);
     await sendToDiscord(discordWebhookUrl, articles);
 
-    const bySite = new Map<string, number[]>();
+    const bySite = new Map<string, (number | string)[]>();
     for (const a of articles) {
       const ids = bySite.get(a.siteKey) ?? [];
       ids.push(a.id);
