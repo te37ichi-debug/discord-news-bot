@@ -58,8 +58,9 @@ async function main(): Promise<void> {
   }
 
   // IMAP メルマガ
-  if (config.mail?.enabled) {
-    const mailWebhook = config.mail.webhookUrl || discordWebhookUrl;
+  const mailEnabled = config.mail?.enabled || !!process.env.GMAIL_USER;
+  if (mailEnabled) {
+    const mailWebhook = process.env.MAIL_WEBHOOK_URL || config.mail?.webhookUrl || discordWebhookUrl;
     const newsletters = await fetchNewsletters();
     if (newsletters.length === 0) {
       console.log("[bot] 新着メルマガなし (IMAP)");

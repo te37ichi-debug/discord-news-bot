@@ -13,7 +13,13 @@ export async function fetchNewsletters(): Promise<Newsletter[]> {
   const config = loadConfig();
   const mailConfig = config.mail;
 
-  if (!mailConfig?.enabled || !mailConfig.user || !mailConfig.appPassword) {
+  // 環境変数を優先、なければconfig.jsonから取得
+  const user = process.env.GMAIL_USER || mailConfig?.user;
+  const appPassword = process.env.GMAIL_APP_PASSWORD || mailConfig?.appPassword;
+  const label = process.env.GMAIL_LABEL || mailConfig?.label || "INBOX";
+  const from = mailConfig?.from || "";
+
+  if (!user || !appPassword) {
     return [];
   }
 
@@ -22,26 +28,24 @@ export async function fetchNewsletters(): Promise<Newsletter[]> {
     port: 993,
     secure: true,
     auth: {
-      user: mailConfig.user,
-      pass: mailConfig.appPassword,
+      user,
+      pass: appPassword,
     },
     logger: false,
   });
 
   const newsletters: Newsletter[] = [];
-  // Gmailラベルはフォルダとしてアクセス
-  const mailbox = mailConfig.label || "INBOX";
 
   try {
     await client.connect();
-    console.log(`[mail] メールボックス「${mailbox}」を確認中...`);
-    const lock = await client.getMailboxLock(mailbox);
+    console.log(`[mail] メールボックス「${label}」を確認中...`);
+    const lock = await client.getMailboxLock(label);
 
     try {
       // 未読メールを検索
       const searchQuery: Record<string, unknown> = { seen: false };
-      if (mailConfig.from) {
-        searchQuery.from = mailConfig.from;
+      if (from) {
+        searchQuery.from = from;
       }
 
       const messages = client.fetch(searchQuery, {
