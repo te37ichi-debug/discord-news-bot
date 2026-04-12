@@ -117,11 +117,16 @@ export async function fetchNewArticles(
       }
 
       console.log(`[fetcher] ${site.name}: ${limited.length}件の新着記事`);
-    } catch (err) {
+    } catch (err: any) {
       console.error(
         `[fetcher] ${site.name} の取得に失敗:`,
         (err as Error).message
       );
+      if (err.response) {
+        console.error(`[fetcher] status: ${err.response.status}, server: ${err.response.headers?.server || "unknown"}`);
+        const body = typeof err.response.data === "string" ? err.response.data.slice(0, 300) : "";
+        if (body) console.error(`[fetcher] body: ${body}`);
+      }
     }
   }
 
