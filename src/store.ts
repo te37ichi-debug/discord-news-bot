@@ -16,7 +16,15 @@ function load(): SeenData {
   }
 }
 
+function ensureDir(): void {
+  const dir = path.dirname(SEEN_PATH);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+}
+
 function save(data: SeenData): void {
+  ensureDir();
   fs.writeFileSync(SEEN_PATH, JSON.stringify(data, null, 2), "utf-8");
 }
 
