@@ -1,9 +1,9 @@
 name: Discord News Bot
 
 on:
-  schedule:
-    - cron: '0 */2 * * *' # 60分ごとに実行
-  workflow_dispatch:          # 手動実行ボタンも追加
+  # schedule は Cloudflare Workers Cron に移行（遅延なし）
+  # - cron: '0 */4 * * *'
+  workflow_dispatch: # 手動実行 & Cloudflare Workerからのトリガー
 
 jobs:
   run-bot:
