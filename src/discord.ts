@@ -47,11 +47,7 @@ export async function sendToDiscord(
     }
 
     try {
-      await axios.post(
-        webhookUrl,
-        { embeds: [embed], flags: 1 << 2 },
-        { timeout: 10000 }
-      );
+      await axios.post(webhookUrl, { embeds: [embed] }, { timeout: 10000 });
       console.log(`[discord] 送信完了: ${article.title}`);
     } catch (err) {
       console.error(
