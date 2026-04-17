@@ -28,33 +28,42 @@ export interface MailConfig {
   webhookUrl: string;
 }
 
+export interface RankingConfig {
+  enabled: boolean;
+  webhookUrl: string;
+  schedule: string; // "HH:MM" format (JST)
+}
+
 export interface BotConfig {
   discordWebhookUrl: string;
   checkIntervalMinutes: number;
   maxPostsPerCheck: number;
+  cronSchedule: string;
   sites: SiteEntry[];
   gmail: GmailConfig;
   mail: MailConfig;
+  ranking: RankingConfig;
 }
 
 const DEFAULT_CONFIG: BotConfig = {
   discordWebhookUrl: "",
   checkIntervalMinutes: 30,
   maxPostsPerCheck: 5,
+  cronSchedule: "0 * * * *",
   sites: [
     {
       name: "Up to date",
       url: "https://uptodate.tokyo/",
       apiBase: "https://uptodate.tokyo/wp-json/wp/v2",
       color: "#1DA1F2",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "fullress",
       url: "https://www.fullress.com/",
       apiBase: "https://www.fullress.com/wp-json/wp/v2",
       color: "#FF6B35",
-      enabled: true,
+      enabled: false,
     },
   ],
   gmail: {
@@ -72,6 +81,11 @@ const DEFAULT_CONFIG: BotConfig = {
     label: "メルマガ",
     webhookUrl: "",
   },
+  ranking: {
+    enabled: false,
+    webhookUrl: "",
+    schedule: "09:00",
+  },
 };
 
 export function loadConfig(): BotConfig {
@@ -79,7 +93,7 @@ export function loadConfig(): BotConfig {
     const raw = fs.readFileSync(CONFIG_PATH, "utf-8");
     const saved = JSON.parse(raw);
     // DEFAULT_CONFIGとマージして新しいフィールドが欠けないようにする
-    return { ...DEFAULT_CONFIG, ...saved, gmail: { ...DEFAULT_CONFIG.gmail, ...saved.gmail }, mail: { ...DEFAULT_CONFIG.mail, ...saved.mail } };
+    return { ...DEFAULT_CONFIG, ...saved, gmail: { ...DEFAULT_CONFIG.gmail, ...saved.gmail }, mail: { ...DEFAULT_CONFIG.mail, ...saved.mail }, ranking: { ...DEFAULT_CONFIG.ranking, ...saved.ranking } };
   } catch {
     return { ...DEFAULT_CONFIG };
   }
