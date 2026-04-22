@@ -56,14 +56,14 @@ const DEFAULT_CONFIG: BotConfig = {
       url: "https://uptodate.tokyo/",
       apiBase: "https://uptodate.tokyo/wp-json/wp/v2",
       color: "#1DA1F2",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "fullress",
       url: "https://www.fullress.com/",
       apiBase: "https://www.fullress.com/wp-json/wp/v2",
       color: "#FF6B35",
-      enabled: false,
+      enabled: true,
     },
   ],
   gmail: {
